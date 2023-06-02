@@ -103,6 +103,10 @@ where
             Rotation::Deg270 => (WIDTH as usize - y - 1, x),
         };
 
+        if y >= HEIGHT as usize || x >= WIDTH as usize {
+            return;
+        }
+
         let index = (y * WIDTH as usize + x) / 2;
 
         let color = color.0.into_inner();
@@ -224,9 +228,9 @@ where
         let index = y * WIDTH as usize + x;
 
         if color.is_on() {
-            self.data[index / 8] |= 1 << (index % 8);
+            self.data[index / 8] |= 1 << (8 - (index % 8) - 1);
         } else {
-            self.data[index / 8] &= !(1 << (index % 8));
+            self.data[index / 8] &= !(1 << (8 - (index % 8) - 1));
         }
     }
 }
