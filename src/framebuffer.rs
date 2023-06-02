@@ -8,6 +8,7 @@
 use embedded_graphics_core::{
     pixelcolor::BinaryColor,
     prelude::{DrawTarget, OriginDimensions, RawData, Size},
+    primitives::Rectangle,
     Pixel,
 };
 use embedded_hal_1::spi::SpiBusWrite;
@@ -124,7 +125,10 @@ where
     [(); WIDTH as usize * HEIGHT as usize / 2]:,
 {
     fn size(&self) -> Size {
-        Size::new(WIDTH as u32, HEIGHT as u32)
+        match self.rotation {
+            Rotation::Deg0 | Rotation::Deg180 => Size::new(WIDTH as u32, HEIGHT as u32),
+            Rotation::Deg90 | Rotation::Deg270 => Size::new(HEIGHT as u32, WIDTH as u32),
+        }
     }
 }
 
@@ -150,6 +154,23 @@ where
         let raw = color.0.into_inner() << 4 | color.0.into_inner();
         self.data.fill(raw);
         Ok(())
+    }
+
+    fn fill_solid(&mut self, area: &Rectangle, color: Self::Color) -> Result<(), Self::Error> {
+        if self.rotation == Rotation::Deg0 && area.top_left.x % 2 == 0 && area.size.width % 2 == 0 {
+            let w = area.size.width as usize / 2;
+            let x_off = area.top_left.x as usize / 2;
+            let raw_pix = color.0.into_inner() << 4 | color.0.into_inner();
+
+            for y in area.top_left.y..area.top_left.y + area.size.height as i32 {
+                let start = (y as usize) * WIDTH as usize / 2 + x_off;
+                let end = start + w;
+                self.data[start..end].fill(raw_pix);
+            }
+            Ok(())
+        } else {
+            self.fill_contiguous(area, core::iter::repeat(color))
+        }
     }
 }
 
@@ -237,7 +258,10 @@ where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
     fn size(&self) -> Size {
-        Size::new(WIDTH as u32, HEIGHT as u32)
+        match self.rotation {
+            Rotation::Deg0 | Rotation::Deg180 => Size::new(WIDTH as u32, HEIGHT as u32),
+            Rotation::Deg90 | Rotation::Deg270 => Size::new(HEIGHT as u32, WIDTH as u32),
+        }
     }
 }
 
