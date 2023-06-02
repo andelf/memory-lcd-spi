@@ -7,12 +7,16 @@ repository = "https://github.com/andelf/memory-lcd-spi"
 documentation = "https://docs.rs/memory-lcd-spi"
 homepage = "https://github.com/andelf/memory-lcd-spi"
 categories = ["embedded-graphics", "embedded-graphics-driver"]
-description = "A driver for Sharp Memory LCD, aka. JDI Memory in Pixel displays via SPI interface."
-keywords = ["memory-lcd", "embedded-graphics", "memory-in-pixel", "sharp", "jdi"]
+description = "A driver for Memory LCD, LPM013M126A, LPM009M360A"
+keywords = [
+    "memory-lcd",
+    "embedded-graphics",
+    "memory-in-pixel",
+    "sharp",
+    "jdi",
+]
 readme = "README.md"
 license = "MIT/Apache-2.0"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 defmt = { version = "0.3.4", optional = true }
