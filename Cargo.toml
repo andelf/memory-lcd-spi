@@ -1,0 +1,23 @@
+[package]
+name = "memory-lcd-spi"
+version = "0.0.1"
+edition = "2021"
+authors = ["Andelf <andelf@gmail.com>"]
+repository = "https://github.com/andelf/memory-lcd-spi"
+documentation = "https://docs.rs/memory-lcd-spi"
+homepage = "https://github.com/andelf/memory-lcd-spi"
+categories = ["embedded-graphics", "embedded-graphics-driver"]
+description = "A driver for Sharp Memory LCD, aka. JDI Memory in Pixel displays via SPI interface."
+keywords = ["memory-lcd", "embedded-graphics", "memory-in-pixel", "sharp", "jdi"]
+readme = "README.md"
+license = "MIT/Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+defmt = { version = "0.3.4", optional = true }
+embedded-graphics-core = { version = "0.4.0", features = ["defmt"] }
+embedded-hal-02 = { package = "embedded-hal", version = "0.2", features = [
+    "unproven",
+] }
+embedded-hal-1 = { package = "embedded-hal", version = "=1.0.0-alpha.10" }
