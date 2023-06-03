@@ -28,6 +28,13 @@ pub enum Rotation {
     Deg270,
 }
 
+impl Rotation {
+    #[inline]
+    fn is_column_row_swap(self) -> bool {
+        matches!(self, Rotation::Deg90 | Rotation::Deg270)
+    }
+}
+
 pub(crate) mod sealed {
     use embedded_hal_1::spi::SpiBusWrite;
 
@@ -94,6 +101,15 @@ where
     }
 
     pub(crate) fn set_pixel(&mut self, x: u16, y: u16, color: Rgb111) {
+        if self.rotation.is_column_row_swap() {
+            if x >= HEIGHT || y >= WIDTH {
+                return;
+            }
+        } else {
+            if y >= HEIGHT || x >= WIDTH {
+                return;
+            }
+        }
         let x = x as usize;
         let y = y as usize;
 
@@ -103,10 +119,6 @@ where
             Rotation::Deg180 => (WIDTH as usize - x - 1, HEIGHT as usize - y - 1),
             Rotation::Deg270 => (WIDTH as usize - y - 1, x),
         };
-
-        if y >= HEIGHT as usize || x >= WIDTH as usize {
-            return;
-        }
 
         let index = (y * WIDTH as usize + x) / 2;
 
@@ -216,6 +228,16 @@ where
     }
 
     pub(crate) fn set_pixel(&mut self, x: u16, y: u16, color: BinaryColor) {
+        if self.rotation.is_column_row_swap() {
+            if x >= HEIGHT || y >= WIDTH {
+                return;
+            }
+        } else {
+            if y >= HEIGHT || x >= WIDTH {
+                return;
+            }
+        }
+
         let x = x as usize;
         let y = y as usize;
 
