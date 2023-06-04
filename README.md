@@ -1,5 +1,10 @@
 # memory-lcd-spi
 
+`embedded-hal` driver for Sharp's Memory LCD and JDI's Memory In Pixel displays.
+
+[![crates.io](https://img.shields.io/crates/v/memory-lcd-spi.svg)](https://crates.io/crates/memory-lcd-spi)
+[![Docs](https://docs.rs/memory-lcd-spi/badge.svg)](https://docs.rs/memory-lcd-spi)
+
 ## Features
 
 - Rotation support
@@ -20,6 +25,7 @@ display.set_rotation(memory_lcd_spi::framebuffer::Rotation::Deg90);
 display.clear(BinaryColor::Off);
 
 // drawing code with embedded-graphics
+
 display.update(&mut delay);
 ```
 
@@ -30,4 +36,7 @@ let mut display: MemoryLCD<LPM013M126A<Rgb111>, _, _> = MemoryLCD::new(spi, cs);
 display.clear(Rgb111::BLACK);
 ```
 
-> **NOTE**: `DISP` pin is not managed by this driver. You should control it by yourself.
+> **NOTE**
+> `DISP` pin is not managed by this driver. You should control it by yourself.
+>
+> `EXTCOMIN` in is not managed by this driver. Follow the datasheet, use either 60Hz PWM or GND.
