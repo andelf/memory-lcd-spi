@@ -68,12 +68,12 @@ where
 {
     // only burst update is supported
     fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
-        for i in 1..=HEIGHT {
+        for i in 0..HEIGHT {
             let start = (i as usize) * WIDTH as usize / 2;
             let end = start + WIDTH as usize / 2;
             let line_data = &self.data[start..end];
             // NOTE: refer to manual, gate address counter is 1-based
-            spi.write(&[crate::CMD_UPDATE_4BIT, i as u8])?;
+            spi.write(&[crate::CMD_UPDATE_4BIT, i as u8 + 1])?;
             spi.write(line_data)?;
         }
         spi.write(&[0x00, 0x00])?;
@@ -267,12 +267,12 @@ where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
     fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
-        for i in 1..=HEIGHT {
+        for i in 0..HEIGHT {
             let start = (i as usize) * WIDTH as usize / 8;
             let end = start + WIDTH as usize / 8;
             let gate_line = &self.data[start..end];
             // gate address is counted from 1
-            spi.write(&[crate::CMD_UPDATE_1BIT, i as u8])?;
+            spi.write(&[crate::CMD_UPDATE_1BIT, i as u8 + 1])?;
             spi.write(gate_line)?;
         }
         spi.write(&[0x00, 0x00])?;
