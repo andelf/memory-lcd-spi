@@ -21,7 +21,8 @@ pub trait DisplaySpec {
     type Framebuffer: FramebufferType;
 }
 
-// NOTE: The commands are actually
+// NOTE: The commands are actually 6 bit, but the MSB of next 10 bit is always 0,
+// So it's a trick to use 8 bit to represent the command.
 pub const CMD_NO_UPDATE: u8 = 0x00;
 pub const CMD_BLINKING_BLACK: u8 = 0x10;
 pub const CMD_BLINKING_INVERSION: u8 = 0x14;
@@ -31,7 +32,7 @@ pub const CMD_VCOM: u8 = 0x40;
 // 0x90 = 0b100100_00
 // Use 4 bit data input
 pub const CMD_UPDATE_4BIT: u8 = 0x90;
-/// 0b100010_00
+// 0b100010_00
 pub const CMD_UPDATE_1BIT: u8 = 0x88;
 
 pub struct MemoryLCD<SPEC: DisplaySpec, SPI, CS> {
@@ -101,6 +102,7 @@ where
     }
 }
 
+/// A dummy pin if your `CS` is controlled by the SPI driver
 pub struct NoCS;
 
 impl embedded_hal_1::digital::ErrorType for NoCS {

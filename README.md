@@ -25,6 +25,13 @@ display.set_rotation(memory_lcd_spi::framebuffer::Rotation::Deg90);
 display.clear(BinaryColor::Off);
 
 // drawing code with embedded-graphics
+Line::new(
+    Point::new(0, 0),
+    Point::new(20, 20),
+)
+.into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 1))
+.draw(&mut *display) // Yes, explicit deref is required
+.unwrap();
 
 display.update(&mut delay);
 ```
@@ -37,6 +44,7 @@ display.clear(Rgb111::BLACK);
 ```
 
 > **Note**
+>
 > `DISP` pin is not managed by this driver. You should control it by yourself.
 >
 > `EXTCOMIN` in is not managed by this driver. Follow the datasheet, use either 60Hz PWM or GND.
