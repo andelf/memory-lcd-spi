@@ -36,7 +36,7 @@ let mut display: MemoryLCD<LPM013M126A<Rgb111>, _, _> = MemoryLCD::new(spi, cs);
 display.clear(Rgb111::BLACK);
 ```
 
-> **NOTE**
+> **Note**
 > `DISP` pin is not managed by this driver. You should control it by yourself.
 >
 > `EXTCOMIN` in is not managed by this driver. Follow the datasheet, use either 60Hz PWM or GND.
