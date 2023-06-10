@@ -105,10 +105,8 @@ where
             if x >= HEIGHT || y >= WIDTH {
                 return;
             }
-        } else {
-            if y >= HEIGHT || x >= WIDTH {
-                return;
-            }
+        } else if y >= HEIGHT || x >= WIDTH {
+            return;
         }
         let x = x as usize;
         let y = y as usize;
@@ -232,10 +230,8 @@ where
             if x >= HEIGHT || y >= WIDTH {
                 return;
             }
-        } else {
-            if y >= HEIGHT || x >= WIDTH {
-                return;
-            }
+        } else if y >= HEIGHT || x >= WIDTH {
+            return;
         }
 
         let x = x as usize;

@@ -6,10 +6,12 @@
 
 use core::ops::{Deref, DerefMut};
 
+use crate::error::Error;
 use embedded_hal_1::{delay::DelayUs, digital::OutputPin, spi::SpiBusWrite};
 use framebuffer::FramebufferType;
 
 pub mod displays;
+pub mod error;
 pub mod framebuffer;
 pub mod pixelcolor;
 
@@ -55,29 +57,29 @@ where
         }
     }
 
-    pub fn turn_on_display<P: OutputPin>(self, disp: &mut P) -> Result<(), P::Error> {
-        let _ = disp.set_high();
+    pub fn turn_on_display<DISP: OutputPin>(self, disp: &mut DISP) -> Result<(), Error<SPI::Error, DISP::Error>> {
+        disp.set_high().map_err(Error::Gpio)?;
         Ok(())
     }
 
-    pub fn turn_off_display<P: OutputPin>(self, disp: &mut P) -> Result<(), P::Error> {
-        let _ = disp.set_low();
+    pub fn turn_off_display<DISP: OutputPin>(self, disp: &mut DISP) -> Result<(), Error<SPI::Error, DISP::Error>> {
+        disp.set_low().map_err(Error::Gpio)?;
         Ok(())
     }
 
-    pub fn init(&mut self) -> Result<(), SPI::Error> {
-        self.cs.set_high();
-        self.spi.write(&[CMD_ALL_CLEAR, 0x00])?;
-        self.cs.set_low();
+    pub fn init(&mut self) -> Result<(), Error<SPI::Error, CS::Error>> {
+        self.cs.set_high().map_err(Error::Gpio)?;
+        self.spi.write(&[CMD_ALL_CLEAR, 0x00]).map_err(Error::Spi)?;
+        self.cs.set_low().map_err(Error::Gpio)?;
         Ok(())
     }
 
-    pub fn update<D: DelayUs>(&mut self, delay: &mut D) -> Result<(), SPI::Error> {
+    pub fn update<D: DelayUs>(&mut self, _delay: &mut D) -> Result<(), Error<SPI::Error, CS::Error>> {
         use crate::framebuffer::sealed::FramebufferSpiUpdate;
 
-        self.cs.set_high();
-        self.framebuffer.update(&mut self.spi)?;
-        self.cs.set_low();
+        self.cs.set_high().map_err(Error::Gpio)?;
+        self.framebuffer.update(&mut self.spi).map_err(Error::Spi)?;
+        self.cs.set_low().map_err(Error::Gpio)?;
         Ok(())
     }
 }

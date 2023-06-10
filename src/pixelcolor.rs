@@ -1,5 +1,8 @@
 use embedded_graphics_core::{
-    pixelcolor::{raw::RawU4, BinaryColor},
+    pixelcolor::{
+        raw::{RawU24, RawU4},
+        BinaryColor, Rgb888,
+    },
     prelude::{PixelColor, RawData, RgbColor},
 };
 
@@ -12,26 +15,22 @@ impl PixelColor for Rgb111 {
 }
 
 impl Rgb111 {
-    pub fn new(red: u8, green: u8, blue: u8) -> Self {
-        Self(RawU4::new((red << 3) | (green << 2) | (blue << 1)))
-    }
-
-    pub fn from_raw(raw: u8) -> Self {
+    pub fn from_u3(raw: u8) -> Self {
         Self(RawU4::new((raw & 0b111) << 1))
     }
 }
 
 impl RgbColor for Rgb111 {
     fn r(&self) -> u8 {
-        (self.0.into_inner() >> 3) as u8 & 0b1
+        (self.0.into_inner() >> 3) & 0b1
     }
 
     fn g(&self) -> u8 {
-        (self.0.into_inner() >> 2) as u8 & 0b1
+        (self.0.into_inner() >> 2) & 0b1
     }
 
     fn b(&self) -> u8 {
-        (self.0.into_inner() >> 1) as u8 & 0b1
+        (self.0.into_inner() >> 1) & 0b1
     }
 
     const MAX_R: u8 = 0b1;
@@ -60,5 +59,18 @@ impl From<BinaryColor> for Rgb111 {
 impl From<RawU4> for Rgb111 {
     fn from(raw: RawU4) -> Self {
         Self(raw)
+    }
+}
+
+impl From<Rgb888> for Rgb111 {
+    fn from(color: Rgb888) -> Self {
+        let raw: RawU24 = color.into();
+        let storage = raw.into_inner();
+
+        let red = ((storage >> 16) as u8 >> 7) & 0b1;
+        let green = ((storage >> 8) as u8 >> 7) & 0b1;
+        let blue = (storage as u8 >> 7) & 0b1;
+
+        Rgb111(RawU4::new((red << 3) | (green << 2) | (blue << 1)))
     }
 }
