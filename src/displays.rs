@@ -46,12 +46,22 @@ impl DisplaySpec for LPM009M360A<BinaryColor> {
     type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, JDI>;
 }
 
-/// 0.56inch, 64x64 BW display
+/// 0.56inch, 64x64 BW display, 13pin 0.3mm FPC
 pub struct LS006B7DH01;
 
 impl DisplaySpec for LS006B7DH01 {
     const WIDTH: u16 = 64;
     const HEIGHT: u16 = 64;
+
+    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, Sharp>;
+}
+
+/// 1.28inch, 128x128 BW display, 10pin 0.5mm FPC
+pub struct LS013B7DH03;
+
+impl DisplaySpec for LS013B7DH03 {
+    const WIDTH: u16 = 128;
+    const HEIGHT: u16 = 128;
 
     type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, Sharp>;
 }
