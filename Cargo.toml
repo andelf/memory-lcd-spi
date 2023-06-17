@@ -7,7 +7,7 @@ repository = "https://github.com/andelf/memory-lcd-spi"
 documentation = "https://docs.rs/memory-lcd-spi"
 homepage = "https://github.com/andelf/memory-lcd-spi"
 categories = ["embedded-graphics", "embedded-graphics-driver"]
-description = "A driver for Memory LCD, LPM013M126A, LPM009M360A"
+description = "A driver for Sharp's Memory LCD or JDI's Memory In Pixel display, LPM013M126A, LPM009M360A, LS027B7DH01, etc."
 keywords = [
     "memory-lcd",
     "embedded-graphics",

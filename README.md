@@ -16,6 +16,9 @@
 - JDI's LPM013M126A or LPM013M126C, 176x176 1.3inch
 - JDI's LPM009M360A, 72x144 0.9inch
 - Sharp's LS006B7DH01, 64x64 0.56inch
+- Sharp's LS013B7DH03, 128x128 1.28inch
+- Sharp's LS027B7DH01, 400x240 2.7inch
+- ...
 
 ## Usage
 
