@@ -34,7 +34,7 @@ pub const CMD_VCOM: u8 = 0x40;
 // 0x90 = 0b100100_00
 // Use 4 bit data input
 pub const CMD_UPDATE_4BIT: u8 = 0x90;
-// 0b100010_00
+// Also apply to Sharp's update mode: 0b100_xxxxx
 pub const CMD_UPDATE_1BIT: u8 = 0x88;
 
 pub struct MemoryLCD<SPEC: DisplaySpec, SPI, CS> {

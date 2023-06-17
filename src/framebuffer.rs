@@ -5,6 +5,8 @@
 //! - Rotation is needed
 //! - TODO: double buffering
 
+use core::marker::PhantomData;
+
 use embedded_graphics_core::{
     pixelcolor::BinaryColor,
     prelude::{DrawTarget, OriginDimensions, RawData, Size},
@@ -41,7 +43,15 @@ pub(crate) mod sealed {
     pub trait FramebufferSpiUpdate {
         fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error>;
     }
+
+    pub trait DriverVariant {}
 }
+
+pub struct JDI;
+pub struct Sharp;
+
+impl sealed::DriverVariant for JDI {}
+impl sealed::DriverVariant for Sharp {}
 
 pub trait FramebufferType: OriginDimensions + DrawTarget + Default + sealed::FramebufferSpiUpdate {}
 
@@ -189,15 +199,16 @@ where
     }
 }
 
-pub struct FramebufferBW<const WIDTH: u16, const HEIGHT: u16>
+pub struct FramebufferBW<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
     data: [u8; WIDTH as usize * HEIGHT as usize / 8],
     rotation: Rotation,
+    _type: PhantomData<TYPE>,
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> Default for FramebufferBW<WIDTH, HEIGHT>
+impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> Default for FramebufferBW<WIDTH, HEIGHT, TYPE>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
@@ -206,7 +217,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> FramebufferBW<WIDTH, HEIGHT>
+impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> FramebufferBW<WIDTH, HEIGHT, TYPE>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
@@ -214,6 +225,7 @@ where
         Self {
             data: [0; WIDTH as usize * HEIGHT as usize / 8],
             rotation: Rotation::Deg0,
+            _type: PhantomData,
         }
     }
 
@@ -258,7 +270,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT>
+impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, JDI>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
@@ -276,12 +288,34 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> FramebufferType for FramebufferBW<WIDTH, HEIGHT> where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:
+impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, Sharp>
+where
+    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+{
+    fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
+        for i in 0..HEIGHT {
+            let start = (i as usize) * WIDTH as usize / 8;
+            let end = start + WIDTH as usize / 8;
+            let gate_line = &self.data[start..end];
+            // gate address is counted from 1
+            spi.write(&[crate::CMD_UPDATE_1BIT, reverse_bits(i as u8 + 1)])?;
+            spi.write(gate_line)?;
+        }
+        spi.write(&[0x00, 0x00])?;
+        Ok(())
+    }
+}
+
+impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> FramebufferType
+    for FramebufferBW<WIDTH, HEIGHT, TYPE>
+where
+    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+    FramebufferBW<WIDTH, HEIGHT, TYPE>: sealed::FramebufferSpiUpdate,
 {
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> OriginDimensions for FramebufferBW<WIDTH, HEIGHT>
+impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> OriginDimensions
+    for FramebufferBW<WIDTH, HEIGHT, TYPE>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
@@ -293,7 +327,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> DrawTarget for FramebufferBW<WIDTH, HEIGHT>
+impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> DrawTarget for FramebufferBW<WIDTH, HEIGHT, TYPE>
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
@@ -319,4 +353,15 @@ where
         }
         Ok(())
     }
+}
+
+// For Sharp's SPI interface
+fn reverse_bits(mut b: u8) -> u8 {
+    let mut r = 0;
+    for _ in 0..8 {
+        r <<= 1;
+        r |= b & 1;
+        b >>= 1;
+    }
+    r
 }

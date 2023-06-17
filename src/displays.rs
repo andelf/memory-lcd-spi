@@ -3,7 +3,7 @@
 use embedded_graphics_core::pixelcolor::BinaryColor;
 
 use crate::{
-    framebuffer::{Framebuffer4Bit, FramebufferBW},
+    framebuffer::{Framebuffer4Bit, FramebufferBW, Sharp, JDI},
     pixelcolor::Rgb111,
     DisplaySpec,
 };
@@ -24,7 +24,7 @@ impl DisplaySpec for LPM013M126A<BinaryColor> {
     const WIDTH: u16 = 176;
     const HEIGHT: u16 = 176;
 
-    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }>;
+    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, JDI>;
 }
 
 /// 0.85inch 8-color display
@@ -43,5 +43,15 @@ impl DisplaySpec for LPM009M360A<BinaryColor> {
     const WIDTH: u16 = 72;
     const HEIGHT: u16 = 144;
 
-    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }>;
+    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, JDI>;
+}
+
+/// 0.56inch, 64x64 BW display
+pub struct LS006B7DH01;
+
+impl DisplaySpec for LS006B7DH01 {
+    const WIDTH: u16 = 64;
+    const HEIGHT: u16 = 64;
+
+    type Framebuffer = FramebufferBW<{ Self::WIDTH }, { Self::HEIGHT }, Sharp>;
 }
