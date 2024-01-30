@@ -16,7 +16,7 @@ keywords = [
     "jdi",
 ]
 readme = "README.md"
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 defmt = { version = "0.3.4", optional = true }
