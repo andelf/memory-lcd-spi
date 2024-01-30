@@ -92,7 +92,7 @@ where
     type Target = SPEC::Framebuffer;
 
     fn deref(&self) -> &Self::Target {
-        todo!()
+        &self.framebuffer
     }
 }
 
