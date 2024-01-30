@@ -7,7 +7,7 @@
 use core::ops::{Deref, DerefMut};
 
 use crate::error::Error;
-use embedded_hal_1::{delay::DelayNs, digital::OutputPin, spi::SpiBus};
+use embedded_hal::{delay::DelayNs, digital::OutputPin, spi::SpiBus};
 use framebuffer::FramebufferType;
 
 pub mod displays;

@@ -13,7 +13,7 @@ use embedded_graphics_core::{
     primitives::Rectangle,
     Pixel,
 };
-use embedded_hal_1::spi::SpiBus;
+use embedded_hal::spi::SpiBus;
 
 use crate::pixelcolor::Rgb111;
 
@@ -38,7 +38,7 @@ impl Rotation {
 }
 
 pub(crate) mod sealed {
-    use embedded_hal_1::spi::SpiBus;
+    use embedded_hal::spi::SpiBus;
 
     pub trait FramebufferSpiUpdate {
         fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error>;

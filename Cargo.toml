@@ -21,7 +21,4 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 defmt = { version = "0.3.4", optional = true }
 embedded-graphics-core = { version = "0.4.0", features = ["defmt"] }
-embedded-hal-02 = { package = "embedded-hal", version = "0.2", features = [
-    "unproven",
-] }
-embedded-hal-1 = { package = "embedded-hal", version = "1.0.0" }
+embedded-hal = { version = "1.0.0" }
