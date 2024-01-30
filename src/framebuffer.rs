@@ -13,7 +13,7 @@ use embedded_graphics_core::{
     primitives::Rectangle,
     Pixel,
 };
-use embedded_hal_1::spi::SpiBusWrite;
+use embedded_hal_1::spi::SpiBus;
 
 use crate::pixelcolor::Rgb111;
 
@@ -38,10 +38,10 @@ impl Rotation {
 }
 
 pub(crate) mod sealed {
-    use embedded_hal_1::spi::SpiBusWrite;
+    use embedded_hal_1::spi::SpiBus;
 
     pub trait FramebufferSpiUpdate {
-        fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error>;
+        fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error>;
     }
 
     pub trait DriverVariant {}
@@ -77,7 +77,7 @@ where
     [(); WIDTH as usize * HEIGHT as usize / 2]:,
 {
     // only burst update is supported
-    fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
+    fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
         for i in 0..HEIGHT {
             let start = (i as usize) * WIDTH as usize / 2;
             let end = start + WIDTH as usize / 2;
@@ -274,7 +274,7 @@ impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for Frame
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
-    fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
+    fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
         for i in 0..HEIGHT {
             let start = (i as usize) * WIDTH as usize / 8;
             let end = start + WIDTH as usize / 8;
@@ -292,7 +292,7 @@ impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for Frame
 where
     [(); WIDTH as usize * HEIGHT as usize / 8]:,
 {
-    fn update<SPI: SpiBusWrite>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
+    fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
         for i in 0..HEIGHT {
             let start = (i as usize) * WIDTH as usize / 8;
             let end = start + WIDTH as usize / 8;
