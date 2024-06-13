@@ -7,6 +7,7 @@
 use core::ops::{Deref, DerefMut};
 
 use crate::error::Error;
+use embedded_graphics_core::{draw_target::DrawTarget, pixelcolor::BinaryColor};
 use embedded_hal::{delay::DelayNs, digital::OutputPin, spi::SpiBus};
 use framebuffer::FramebufferType;
 
@@ -75,7 +76,7 @@ where
         Ok(())
     }
 
-    pub fn update<D: DelayNs>(&mut self, _delay: &mut D) -> Result<(), Error<SPI::Error>> {
+    pub fn update(&mut self) -> Result<(), Error<SPI::Error>> {
         use crate::framebuffer::sealed::FramebufferSpiUpdate;
 
         self.cs.set_high().map_err(|_| Error::Gpio)?;
