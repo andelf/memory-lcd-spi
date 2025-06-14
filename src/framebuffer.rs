@@ -55,26 +55,20 @@ impl sealed::DriverVariant for Sharp {}
 
 pub trait FramebufferType: OriginDimensions + DrawTarget + Default + sealed::FramebufferSpiUpdate {}
 
-pub struct Framebuffer4Bit<const WIDTH: u16, const HEIGHT: u16>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
+pub struct Framebuffer4Bit<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize>
 {
-    data: [u8; WIDTH as usize * HEIGHT as usize / 2],
+    data: [u8; SIZE],
     rotation: Rotation,
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> Default for Framebuffer4Bit<WIDTH, HEIGHT>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> Default for Framebuffer4Bit<WIDTH, HEIGHT, SIZE>
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for Framebuffer4Bit<WIDTH, HEIGHT>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> sealed::FramebufferSpiUpdate for Framebuffer4Bit<WIDTH, HEIGHT, SIZE>
 {
     // only burst update is supported
     fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
@@ -91,13 +85,11 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> Framebuffer4Bit<WIDTH, HEIGHT>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> Framebuffer4Bit<WIDTH, HEIGHT, SIZE>
 {
     pub fn new() -> Self {
         Self {
-            data: [0; WIDTH as usize * HEIGHT as usize / 2],
+            data: [0; SIZE],
             rotation: Rotation::Deg0,
         }
     }
@@ -140,14 +132,11 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> FramebufferType for Framebuffer4Bit<WIDTH, HEIGHT> where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> FramebufferType for Framebuffer4Bit<WIDTH, HEIGHT, SIZE>
 {
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> OriginDimensions for Framebuffer4Bit<WIDTH, HEIGHT>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> OriginDimensions for Framebuffer4Bit<WIDTH, HEIGHT, SIZE>
 {
     fn size(&self) -> Size {
         match self.rotation {
@@ -157,10 +146,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> DrawTarget for Framebuffer4Bit<WIDTH, HEIGHT>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 2]:,
-{
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> DrawTarget for Framebuffer4Bit<WIDTH, HEIGHT, SIZE> {
     type Color = Rgb111;
 
     type Error = core::convert::Infallible;
@@ -199,31 +185,25 @@ where
     }
 }
 
-pub struct FramebufferBW<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+pub struct FramebufferBW<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant>
 {
-    data: [u8; WIDTH as usize * HEIGHT as usize / 8],
+    data: [u8; SIZE],
     rotation: Rotation,
     _type: PhantomData<TYPE>,
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> Default for FramebufferBW<WIDTH, HEIGHT, TYPE>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant> Default for FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> FramebufferBW<WIDTH, HEIGHT, TYPE>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant> FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>
 {
     pub fn new() -> Self {
         Self {
-            data: [0; WIDTH as usize * HEIGHT as usize / 8],
+            data: [0; SIZE],
             rotation: Rotation::Deg0,
             _type: PhantomData,
         }
@@ -270,9 +250,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, JDI>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, SIZE, JDI>
 {
     fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
         for i in 0..HEIGHT {
@@ -288,9 +266,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, Sharp>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize> sealed::FramebufferSpiUpdate for FramebufferBW<WIDTH, HEIGHT, SIZE, Sharp>
 {
     fn update<SPI: SpiBus>(&self, spi: &mut SPI) -> Result<(), SPI::Error> {
         for i in 0..HEIGHT {
@@ -306,18 +282,15 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> FramebufferType
-    for FramebufferBW<WIDTH, HEIGHT, TYPE>
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant> FramebufferType
+    for FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>
 where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
-    FramebufferBW<WIDTH, HEIGHT, TYPE>: sealed::FramebufferSpiUpdate,
+    FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>: sealed::FramebufferSpiUpdate,
 {
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> OriginDimensions
-    for FramebufferBW<WIDTH, HEIGHT, TYPE>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant> OriginDimensions
+    for FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>
 {
     fn size(&self) -> Size {
         match self.rotation {
@@ -327,9 +300,7 @@ where
     }
 }
 
-impl<const WIDTH: u16, const HEIGHT: u16, TYPE: sealed::DriverVariant> DrawTarget for FramebufferBW<WIDTH, HEIGHT, TYPE>
-where
-    [(); WIDTH as usize * HEIGHT as usize / 8]:,
+impl<const WIDTH: u16, const HEIGHT: u16, const SIZE: usize, TYPE: sealed::DriverVariant> DrawTarget for FramebufferBW<WIDTH, HEIGHT, SIZE, TYPE>
 {
     type Color = BinaryColor;
 

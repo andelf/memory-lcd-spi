@@ -2,7 +2,6 @@
 
 #![no_std]
 #![allow(incomplete_features)]
-#![feature(generic_const_exprs)]
 
 use core::ops::{Deref, DerefMut};
 
@@ -19,6 +18,7 @@ pub mod pixelcolor;
 pub trait DisplaySpec {
     const WIDTH: u16;
     const HEIGHT: u16;
+    const SIZE: usize; // Buffer size for the display
 
     type Framebuffer: FramebufferType;
 }
